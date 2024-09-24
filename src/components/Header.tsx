@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+// import { SearchComponent } from '@/components/SearchComponent';
 
 const Header = () => {
   return (
@@ -8,6 +11,7 @@ const Header = () => {
           <span className="font-bold sm:inline-block">Jackson產業觀點</span>
         </Link>
         <nav className="hidden md:flex space-x-4">
+          {/* <SearchComponent /> */}
           <Link
             href="https://linktr.ee/jacksontseng"
             className="text-sm font-medium"

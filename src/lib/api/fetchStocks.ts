@@ -20,12 +20,30 @@ export interface Stock {
   marketValue: string;
   reportDate: string;
   analyst: string;
-  reportMomentum: string[]; // 改为字符串数组
+  reportMomentum: string[];
 }
 
 type RawStockRecord = Record<string, string>;
 
+interface Cache<T> {
+  data: T | null;
+  timestamp: number;
+}
+
+let stocksCache: Cache<Stock[]> = {
+  data: null,
+  timestamp: 0,
+};
+
+const CACHE_EXPIRY = 30 * 60 * 1000; // 30分鐘
+
 export async function fetchStocks(): Promise<Stock[]> {
+  const now = Date.now();
+  if (stocksCache.data && now - stocksCache.timestamp < CACHE_EXPIRY) {
+    console.log('Returning cached data');
+    return stocksCache.data;
+  }
+
   try {
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) {
@@ -36,11 +54,6 @@ export async function fetchStocks(): Promise<Stock[]> {
     // 移除第一行
     data = data.split('\n').slice(1).join('\n');
 
-    console.log(
-      'Processed CSV data (first 1000 characters):',
-      data.slice(0, 1000)
-    );
-
     const records = parse(data, {
       columns: true,
       skip_empty_lines: true,
@@ -50,33 +63,12 @@ export async function fetchStocks(): Promise<Stock[]> {
       encoding: 'utf8',
     }) as RawStockRecord[];
 
-    console.log(`Parsed ${records.length} records from CSV`);
-    console.log(
-      'First 3 records:',
-      JSON.stringify(records.slice(0, 3), null, 2)
-    );
-
     const stocks = records
-      .map((record: RawStockRecord, index: number) => {
-        // 檢查所有必要的字段
-        const requiredFields = [
-          '股票代號',
-          '股票名稱',
-          '報告日期',
-          '報告動能觀點',
-        ];
-        const missingFields = requiredFields.filter((field) => !record[field]);
-
-        if (missingFields.length > 0) {
-          console.log(
-            `Record ${index}: Missing fields: ${missingFields.join(
-              ', '
-            )}. Record:`,
-            JSON.stringify(record, null, 2)
-          );
-          return null;
-        }
-
+      .filter((record: RawStockRecord) => {
+        // 只有當報告日期和報告動能觀點都有資料時才處理
+        return record['報告日期'] && record['報告動能觀點'];
+      })
+      .map((record: RawStockRecord) => {
         return {
           stockCode: record['股票代號'] || '',
           stockName: record['股票名稱'] || '',
@@ -98,17 +90,13 @@ export async function fetchStocks(): Promise<Stock[]> {
             .split('\n')
             .filter((p) => p.trim() !== ''),
         };
-      })
-      .filter((stock): stock is Stock => !!stock);
+      });
 
-    console.log(`Processed ${stocks.length} valid stocks`);
-    if (stocks.length > 0) {
-      console.log('First stock:', JSON.stringify(stocks[0], null, 2));
-    }
-    console.log(
-      'Stock codes:',
-      stocks.map((s) => s.stockCode)
-    );
+    // 更新緩存
+    stocksCache = {
+      data: stocks,
+      timestamp: now,
+    };
 
     return stocks;
   } catch (error) {
@@ -119,7 +107,7 @@ export async function fetchStocks(): Promise<Stock[]> {
 
 export async function fetchStockReport(stockCode: string): Promise<Stock> {
   const stocks = await fetchStocks();
-  console.log(`Searching for stock code: ${stockCode}`);
+
   const stock = stocks.find((s) => s.stockCode === stockCode);
   if (!stock) {
     console.log(
