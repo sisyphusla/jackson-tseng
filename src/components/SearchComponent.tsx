@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
-import { StockCard } from '@/components/StockCard';
 import { Stock } from '@/lib/api/fetchStocks';
 import Link from 'next/link';
 
