@@ -1,7 +1,7 @@
-import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
+import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 export interface StockCardProps {
   stockCode: string;
@@ -12,31 +12,33 @@ export interface StockCardProps {
   targetPrice: string;
   reportDate: string;
   analyst: string;
-  reportMomentum: string;
+  reportMomentum: string[];
   marketValue: string;
   eps24F: string;
   pe24F: string;
 }
 
 export function StockCard(props: StockCardProps) {
-  const { 
-    stockCode, 
-    stockName, 
-    industry, 
-    currentPrice, 
+  const {
+    stockCode,
+    stockName,
+    industry,
+    currentPrice,
     marketValue,
     eps24F,
     pe24F,
-    reportDate
+    reportDate,
   } = props;
 
   return (
     <Card className="w-full m-2 shadow-md">
       <CardHeader className="flex flex-row items-center justify-between p-4 pb-2">
-        <CardTitle className="text-lg font-bold">{stockCode} {stockName}</CardTitle>
+        <CardTitle className="text-lg font-bold">
+          {stockCode} {stockName}
+        </CardTitle>
         <span className="text-lg font-semibold">現價: {currentPrice}</span>
       </CardHeader>
-      <Separator/>
+      <Separator />
       <CardContent className="p-4 pt-3">
         <div className="flex justify-between mb-3">
           <span className="text-sm w-1/2 text-left">市值: {marketValue}</span>
@@ -56,5 +58,5 @@ export function StockCard(props: StockCardProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
