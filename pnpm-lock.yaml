@@ -11,9 +11,6 @@ dependencies:
   '@radix-ui/react-slot':
     specifier: ^1.1.0
     version: 1.1.0(@types/react@18.3.8)(react@18.3.1)
-  '@types/papaparse':
-    specifier: ^5.3.14
-    version: 5.3.14
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
@@ -677,12 +674,7 @@ packages:
     resolution: {integrity: sha512-T7PpxM/6yeDE+AdlVysT62BX6/bECZOmQAgiFg5NoBd5MQheZ3tzal7f1wvzfiEcmrcJNRi2zRr2nY2zF+0uqw==}
     dependencies:
       undici-types: 6.19.8
-
-  /@types/papaparse@5.3.14:
-    resolution: {integrity: sha512-LxJ4iEFcpqc6METwp9f6BV6VVc43m6MfH0VqFosHvrUgfXiFe6ww7R3itkOQ+TCK6Y+Iv/+RnnvtRZnkc5Kc9g==}
-    dependencies:
-      '@types/node': 20.16.6
-    dev: false
+    dev: true
 
   /@types/prop-types@15.7.13:
     resolution: {integrity: sha512-hCZTSvwbzWGvhqxp/RqVqwU999pBf2vp7hzIjiYOsl8wqOmUxkQ6ddw1cV3l8811+kdUFus/q4d1Y3E3SyEifA==}
@@ -3711,6 +3703,7 @@ packages:
 
   /undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
+    dev: true
 
   /universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}

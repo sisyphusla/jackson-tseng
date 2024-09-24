@@ -1,12 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  DollarSign,
-  TrendingUp,
-  BarChart2,
-  PieChart,
-  Briefcase,
-} from 'lucide-react';
+import { DollarSign, BarChart2 } from 'lucide-react';
 import { fetchStockReport } from '@/lib/api/fetchStockReport';
 
 export default async function StockReportPage({
