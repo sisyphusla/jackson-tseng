@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, BarChart2 } from 'lucide-react';
+import { DollarSign, Info, TrendingUp, PieChart } from 'lucide-react';
 import { fetchStockReport } from '@/lib/api/fetchStockReport';
 import { fetchStocks } from '@/lib/api/fetchStocks';
 import { notFound } from 'next/navigation';
@@ -24,8 +24,37 @@ export default async function StockReportPage({
   if (!stock) {
     notFound();
   }
+
+  const getColorClass = (value: string, isGrowth = false) => {
+    const numValue = parseFloat(value.replace('%', ''));
+    if (isNaN(numValue)) return '';
+
+    if (isGrowth) {
+      if (numValue > 0) {
+        if (numValue > 20) return 'text-pink-600 font-bold';
+        if (numValue > 15) return 'text-pink-500 font-bold';
+        if (numValue > 10) return 'text-pink-400 font-bold';
+        if (numValue > 5) return 'text-pink-300 font-bold';
+        return 'text-pink-200 font-bold';
+      } else if (numValue < 0) {
+        if (numValue < -20) return 'text-green-600';
+        if (numValue < -15) return 'text-green-500';
+        if (numValue < -10) return 'text-green-400';
+        if (numValue < -5) return 'text-green-300';
+        return 'text-green-200';
+      }
+    } else {
+      return numValue > 0
+        ? 'text-red-500 font-bold'
+        : numValue < 0
+        ? 'text-green-500'
+        : '';
+    }
+
+    return '';
+  };
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-6 min-h-[calc(100vh-3.5rem)]">
       <Card className="w-full">
         <CardHeader className="flex flex-col items-center justify-between space-y-2">
           <CardTitle className="text-2xl font-bold w-full">
@@ -35,70 +64,163 @@ export default async function StockReportPage({
                 {'   '}
                 {stock.stockName}
               </span>
-              <span>{stock.industry}</span>
               <span>現價：{stock.currentPrice}</span>
-              <span>市值：{stock.marketValue}</span>
               <span>{stock.reportDate}</span>
             </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-            <Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 auto-cols-fr gap-4">
+            <Card className="lg:col-span-1">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">價格</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm">年初價格：</span>
-                  <span className="text-lg font-bold">
-                    {stock.yearStartPrice}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm">目標價：</span>
-                  <span className="text-lg font-bold">{stock.targetPrice}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted-foreground">YTD：</span>
-                  <span className="text-xs text-muted-foreground">
-                    {stock.yearToDateReturn}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted-foreground">
-                    潛在幅度：
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {stock.potentialGrowth}
-                  </span>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-start items-center">
+                      <span className="text-xs text-muted-foreground">
+                        年初價格：
+                      </span>
+                      <span className="text-xs font-medium">
+                        {stock.yearStartPrice}
+                      </span>
+                    </div>
+                    <div className="flex justify-start items-center">
+                      <span className="text-xs text-muted-foreground">
+                        目標價：
+                      </span>
+                      <span className="text-xs font-medium">
+                        {stock.targetPrice}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-start items-center">
+                      <span className="text-xs text-muted-foreground">
+                        YTD：
+                      </span>
+                      <span
+                        className={`text-xs font-medium ${getColorClass(
+                          stock.yearToDateReturn
+                        )}`}
+                      >
+                        {stock.yearToDateReturn}
+                      </span>
+                    </div>
+                    <div className="flex justify-start items-center">
+                      <span className="text-xs text-muted-foreground">
+                        潛在幅度：
+                      </span>
+                      <span
+                        className={`text-xs font-medium ${getColorClass(
+                          stock.potentialGrowth,
+                          true
+                        )}`}
+                      >
+                        {stock.potentialGrowth}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="lg:col-span-1">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  EPS & P/E Ratio
-                </CardTitle>
-                <BarChart2 className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">基本資訊</CardTitle>
+                <Info className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <p className="text-sm font-medium">EPS</p>
-                    <p className="text-lg">24F: {stock.eps24F}</p>
-                    <p className="text-lg">25F: {stock.eps25F}</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-start items-center">
+                      <span className="text-xs text-muted-foreground">
+                        市值：
+                      </span>
+                      <span className="text-xs ">{stock.marketValue}</span>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium">P/E Ratio</p>
-                    <p className="text-lg">24F: {stock.pe24F}</p>
-                    <p className="text-lg">25F: {stock.targetPE}</p>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-start items-center">
+                      <span className="text-xs text-muted-foreground">
+                        產業：
+                      </span>
+                      <span className="text-xs ">{stock.industry}</span>
+                    </div>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  年增長: {stock.yearOverYearGrowth}
-                </p>
+              </CardContent>
+            </Card>
+            <Card className="lg:col-span-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">EPS</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-start items-center">
+                      <span className="text-xs text-muted-foreground">
+                        24EPS(F)：
+                      </span>
+                      <span className="text-xs font-medium">
+                        {stock.eps24F}
+                      </span>
+                    </div>
+                    <div className="flex justify-start items-center">
+                      <span className="text-xs text-muted-foreground">
+                        25EPS(F)：
+                      </span>
+                      <span className="text-xs font-medium">
+                        {stock.eps25F}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-start items-center">
+                      <span className="text-xs text-muted-foreground">
+                        YoY：
+                      </span>
+                      <span
+                        className={`text-xs font-medium ${getColorClass(
+                          stock.yearOverYearGrowth,
+                          true
+                        )}`}
+                      >
+                        {stock.yearOverYearGrowth}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="lg:col-span-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">P/E Ratio</CardTitle>
+                <PieChart className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-start items-center">
+                      <span className="text-xs text-muted-foreground">
+                        24EPS(F)：
+                      </span>
+                      <span className="text-xs font-medium">{stock.pe24F}</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-start items-center">
+                      <span className="text-xs text-muted-foreground">
+                        (T)PE：
+                      </span>
+                      <span className="text-xs font-medium">
+                        {stock.targetPE}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -110,7 +232,7 @@ export default async function StockReportPage({
               <CardContent className="whitespace-pre-line leading-relaxed tracking-widest">
                 {stock.reportMomentum.map((paragraph, index) => (
                   <React.Fragment key={index}>
-                    {paragraph}
+                    {'-'} {paragraph}
                     {index < stock.reportMomentum.length - 1 && (
                       <>
                         <br />
