@@ -1,16 +1,22 @@
-import { StockCard } from '@/components/StockCard';
+import { Suspense } from 'react';
 import { fetchStocks, Stock } from '@/lib/api/fetchStocks';
+import StockList from '@/components/StockList';
+
+export const revalidate = 14400; // 4 hours
+
+async function getStocks(): Promise<Stock[]> {
+  const stocks = await fetchStocks();
+  return stocks;
+}
 
 export default async function Home() {
-  const stocks: Stock[] = await fetchStocks();
+  const initialStocks = await getStocks();
 
   return (
     <main className="container mx-auto p-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {stocks.map((stock, index) => (
-          <StockCard key={index} {...stock} />
-        ))}
-      </div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <StockList initialStocks={initialStocks} />
+      </Suspense>
     </main>
   );
 }

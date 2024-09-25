@@ -50,7 +50,7 @@ export function StockCard(props: StockCardProps) {
         </div>
         <div className="mt-4">
           <p className="text-sm text-gray-500 mb-2">報告日期: {reportDate}</p>
-          <Link href={`/stock/${stockCode}/report`} passHref>
+          <Link href={`/${stockCode}/report`} passHref>
             <Button variant="outline" className="w-full">
               報告動能觀點
             </Button>

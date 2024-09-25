@@ -25,32 +25,19 @@ export interface Stock {
 
 type RawStockRecord = Record<string, string>;
 
-interface Cache<T> {
-  data: T | null;
-  timestamp: number;
-}
-
-let stocksCache: Cache<Stock[]> = {
-  data: null,
-  timestamp: 0,
-};
-
 const CACHE_EXPIRY = 30 * 60 * 1000; // 30分鐘
 
 export async function fetchStocks(): Promise<Stock[]> {
-  const now = Date.now();
-  if (stocksCache.data && now - stocksCache.timestamp < CACHE_EXPIRY) {
-    console.log('Returning cached data');
-    return stocksCache.data;
-  }
-
   try {
-    const res = await fetch(url, { cache: 'no-store' });
+    const res = await fetch(url, {
+      next: { revalidate: 14400 }, // 重新驗證時間設置為4小時 (14400秒)
+    });
+
     if (!res.ok) {
       throw new Error(`Failed to fetch CSV: ${res.status} ${res.statusText}`);
     }
-    let data = await res.text();
 
+    let data = await res.text();
     // 移除第一行
     data = data.split('\n').slice(1).join('\n');
 
@@ -92,12 +79,6 @@ export async function fetchStocks(): Promise<Stock[]> {
         };
       });
 
-    // 更新緩存
-    stocksCache = {
-      data: stocks,
-      timestamp: now,
-    };
-
     return stocks;
   } catch (error) {
     console.error('Error fetching stocks:', error);
@@ -105,7 +86,9 @@ export async function fetchStocks(): Promise<Stock[]> {
   }
 }
 
-export async function fetchStockReport(stockCode: string): Promise<Stock> {
+export async function fetchStockReport(
+  stockCode: string
+): Promise<Stock | null> {
   const stocks = await fetchStocks();
 
   const stock = stocks.find((s) => s.stockCode === stockCode);
@@ -114,7 +97,7 @@ export async function fetchStockReport(stockCode: string): Promise<Stock> {
       'Available stock codes:',
       stocks.map((s) => s.stockCode)
     );
-    throw new Error(`Stock with code ${stockCode} not found`);
+    return null;
   }
   return stock;
 }

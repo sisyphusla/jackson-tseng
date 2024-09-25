@@ -2,6 +2,17 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, BarChart2 } from 'lucide-react';
 import { fetchStockReport } from '@/lib/api/fetchStockReport';
+import { fetchStocks } from '@/lib/api/fetchStocks';
+import { notFound } from 'next/navigation';
+
+export const revalidate = 14400; // 4 hours
+
+export async function generateStaticParams() {
+  const stocks = await fetchStocks();
+  return stocks.map((stock) => ({
+    stockCode: stock.stockCode,
+  }));
+}
 
 export default async function StockReportPage({
   params,
@@ -10,6 +21,9 @@ export default async function StockReportPage({
 }) {
   const stock = await fetchStockReport(params.stockCode);
 
+  if (!stock) {
+    notFound();
+  }
   return (
     <div className="container mx-auto p-6">
       <Card className="w-full">
