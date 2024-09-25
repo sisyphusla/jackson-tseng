@@ -72,6 +72,7 @@ export async function fetchStocks(): Promise<Stock[]> {
         const stockCode = record['股票代號'] || '';
         const currentPrice = parseFloat(record['現價']);
         // 使用 JSON 數據獲取年初價格
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const yearStartPrice = parseFloat(
           (yearStartPrices as any)[stockCode] || '0'
         );
