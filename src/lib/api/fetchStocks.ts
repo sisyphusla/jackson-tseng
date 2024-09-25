@@ -25,6 +25,7 @@ export interface Stock {
 }
 
 type RawStockRecord = Record<string, string>;
+const typedYearStartPrices: Record<string, unknown> = yearStartPrices;
 
 let cachedStocks: Stock[] | null = null;
 const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 小時
@@ -72,10 +73,12 @@ export async function fetchStocks(): Promise<Stock[]> {
         const stockCode = record['股票代號'] || '';
         const currentPrice = parseFloat(record['現價']);
         // 使用 JSON 數據獲取年初價格
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const yearStartPrice = parseFloat(
-          (yearStartPrices as any)[stockCode] || '0'
-        );
+        const yearStartPriceStr = typedYearStartPrices[stockCode];
+        const yearStartPrice =
+          typeof yearStartPriceStr === 'string'
+            ? parseFloat(yearStartPriceStr)
+            : 0;
+
         const yearToDateReturn = yearStartPrice
           ? (((currentPrice - yearStartPrice) / yearStartPrice) * 100).toFixed(
               2
