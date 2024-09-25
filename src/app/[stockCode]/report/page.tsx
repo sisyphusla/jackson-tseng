@@ -5,7 +5,7 @@ import { fetchStockReport } from '@/lib/api/fetchStockReport';
 import { fetchStocks } from '@/lib/api/fetchStocks';
 import { notFound } from 'next/navigation';
 
-export const revalidate = 14400; // 4 hours
+export const revalidate = 3600; // 1 hours
 
 export async function generateStaticParams() {
   const stocks = await fetchStocks();
@@ -37,11 +37,11 @@ export default async function StockReportPage({
         if (numValue > 5) return 'text-pink-300 font-bold';
         return 'text-pink-200 font-bold';
       } else if (numValue < 0) {
-        if (numValue < -20) return 'text-green-600';
-        if (numValue < -15) return 'text-green-500';
-        if (numValue < -10) return 'text-green-400';
-        if (numValue < -5) return 'text-green-300';
-        return 'text-green-200';
+        if (numValue < -20) return 'text-green-800';
+        if (numValue < -15) return 'text-green-700';
+        if (numValue < -10) return 'text-green-600';
+        if (numValue < -5) return 'text-green-500';
+        return 'text-green-400 font-bold';
       }
     } else {
       return numValue > 0

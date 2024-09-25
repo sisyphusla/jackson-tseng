@@ -37,7 +37,7 @@ export async function fetchStocks(): Promise<Stock[]> {
 
   try {
     const res = await fetch(url, {
-      next: { revalidate: 14400 }, // 重新驗證時間設置為4小時 (14400秒)
+      next: { revalidate: 3600 }, // 重新驗證時間設置為1小時
     });
 
     if (!res.ok) {

@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { fetchStocks, Stock } from '@/lib/api/fetchStocks';
 import StockList from '@/components/StockList';
 
-export const revalidate = 14400; // 4 hours
+export const revalidate = 3600; // 1 hours
 
 async function getStocks(): Promise<Stock[]> {
   const stocks = await fetchStocks();
