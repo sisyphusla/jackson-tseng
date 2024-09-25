@@ -6,4 +6,4 @@ export async function GET(): Promise<NextResponse<Stock[]>> {
   return NextResponse.json(stocks);
 }
 
-export const revalidate = 3600; // 1 hours
+export const revalidate = 3600 * 4; // 4 hours

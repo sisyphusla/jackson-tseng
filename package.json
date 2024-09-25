@@ -15,6 +15,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "csv-parse": "^5.5.6",
+    "google-auth-library": "^9.14.1",
+    "googleapis": "^144.0.0",
     "lucide-react": "^0.445.0",
     "next": "14.2.13",
     "papaparse": "^5.4.1",

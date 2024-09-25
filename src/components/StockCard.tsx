@@ -23,6 +23,7 @@ export function StockCard(props: StockCardProps) {
     stockCode,
     stockName,
     industry,
+    analyst,
     currentPrice,
     eps24F,
     pe24F,
@@ -74,8 +75,15 @@ export function StockCard(props: StockCardProps) {
           <span className="text-sm w-1/2 text-left">EPS24(F): {eps24F}</span>
           <span className="text-sm w-1/2 text-left">24PE(F): {pe24F}</span>
         </div>
+        <div className="flex justify-between mb-3">
+          <span className="text-xs text-gray-500 w-1/2 text-left">
+            報告日期: {reportDate}
+          </span>
+          <span className="text-xs text-gray-500 w-1/2 text-left">
+            券商: {analyst}
+          </span>
+        </div>
         <div className="mt-4">
-          <p className="text-sm text-gray-500 mb-2">報告日期: {reportDate}</p>
           <Link href={`/${stockCode}/report`} passHref>
             <Button variant="outline" className="w-full">
               報告動能觀點
