@@ -25,14 +25,23 @@ export interface Stock {
 
 type RawStockRecord = Record<string, string>;
 
+let cachedStocks: Stock[] | null = null;
+const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 小時
+let lastFetchTime = 0;
+
 export async function fetchStocks(): Promise<Stock[]> {
+  const now = Date.now();
+  if (cachedStocks && now - lastFetchTime < CACHE_DURATION) {
+    return cachedStocks;
+  }
+
   try {
     const res = await fetch(url, {
       next: { revalidate: 14400 }, // 重新驗證時間設置為4小時 (14400秒)
     });
 
     if (!res.ok) {
-      throw new Error(`Failed to fetch CSV: ${res.status} ${res.statusText}`);
+      throw new Error(`無法獲取 CSV：${res.status} ${res.statusText}`);
     }
 
     let data = await res.text();
@@ -48,7 +57,7 @@ export async function fetchStocks(): Promise<Stock[]> {
       encoding: 'utf8',
     }) as RawStockRecord[];
 
-    const stocks = records
+    cachedStocks = records
       .filter((record: RawStockRecord) => {
         // 只有當報告日期和報告動能觀點都有資料時才處理
         return record['報告日期'] && record['報告動能觀點'];
@@ -77,10 +86,11 @@ export async function fetchStocks(): Promise<Stock[]> {
         };
       });
 
-    return stocks;
+    lastFetchTime = now;
+    return cachedStocks;
   } catch (error) {
-    console.error('Error fetching stocks:', error);
-    return [];
+    console.error('獲取股票數據時發生錯誤:', error);
+    return cachedStocks || []; // 如果發生錯誤，返回緩存的數據（如果有的話）
   }
 }
 
@@ -92,7 +102,7 @@ export async function fetchStockReport(
   const stock = stocks.find((s) => s.stockCode === stockCode);
   if (!stock) {
     console.log(
-      'Available stock codes:',
+      '可用的股票代碼:',
       stocks.map((s) => s.stockCode)
     );
     return null;

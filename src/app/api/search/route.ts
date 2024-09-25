@@ -1,15 +1,12 @@
 import { NextResponse } from 'next/server';
-import { fetchStocks } from '@/lib/api/fetchStocks';
+import { fetchStocks, Stock } from '@/lib/api/fetchStocks';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('query');
 
   if (!query) {
-    return NextResponse.json(
-      { error: 'Query parameter is required' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: '需要提供查詢參數' }, { status: 400 });
   }
 
   try {
@@ -22,9 +19,9 @@ export async function GET(request: Request) {
 
     return NextResponse.json(filteredStocks);
   } catch (error) {
-    console.error('Error fetching stocks:', error);
+    console.error('搜索股票時發生錯誤:', error);
     return NextResponse.json(
-      { error: 'An error occurred while fetching stocks' },
+      { error: '搜索股票時發生錯誤，請稍後再試' },
       { status: 500 }
     );
   }

@@ -2,44 +2,26 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Stock } from '@/lib/api/fetchStocks';
 import Link from 'next/link';
+import useSWR from 'swr';
+import { Search } from 'lucide-react';
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function SearchComponent() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [stocks, setStocks] = useState<Stock[]>([]);
-  const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const fetchStocks = async () => {
-      if (searchTerm.length < 2) {
-        setStocks([]);
-        return;
-      }
+  const { data: stocks, error } = useSWR<Stock[]>(
+    searchTerm.length > 1
+      ? `/api/search?query=${encodeURIComponent(searchTerm)}`
+      : null,
+    fetcher,
+    { dedupingInterval: 5000 }
+  );
 
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `/api/search?query=${encodeURIComponent(searchTerm)}`
-        );
-        if (!response.ok) {
-          throw new Error('Failed to fetch stocks');
-        }
-        const data = await response.json();
-        setStocks(data);
-      } catch (error) {
-        console.error('Error fetching stocks:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const debounce = setTimeout(() => {
-      fetchStocks();
-    }, 300);
-
-    return () => clearTimeout(debounce);
-  }, [searchTerm]);
+  const loading = !stocks && !error && searchTerm.length > 1;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -48,6 +30,7 @@ export function SearchComponent() {
         !searchRef.current.contains(event.target as Node)
       ) {
         setShowResults(false);
+        setIsSearchVisible(false);
       }
     }
 
@@ -57,40 +40,69 @@ export function SearchComponent() {
     };
   }, []);
 
+  const toggleSearch = () => {
+    setIsSearchVisible(!isSearchVisible);
+    if (!isSearchVisible) {
+      setTimeout(() => {
+        const input = document.querySelector(
+          'input[type="text"]'
+        ) as HTMLInputElement;
+        if (input) input.focus();
+      }, 100);
+    }
+  };
+
   return (
     <div className="relative" ref={searchRef}>
-      <Input
-        type="text"
-        placeholder="搜尋股票代碼或名稱"
-        value={searchTerm}
-        onChange={(e) => {
-          setSearchTerm(e.target.value);
-          setShowResults(true);
-        }}
-        className="w-64"
-      />
-      {showResults && (searchTerm.length > 1 || stocks.length > 0) && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
-          {loading && <p className="p-2">載入中...</p>}
-          {!loading && stocks.length === 0 && (
-            <p className="p-2">沒有找到相關股票</p>
+      <div className="sm:hidden">
+        <button onClick={toggleSearch} className="p-2">
+          <Search size={20} />
+        </button>
+      </div>
+      <div
+        className={`${
+          isSearchVisible ? 'block' : 'hidden'
+        } sm:block absolute right-0 top-full sm:relative sm:top-auto sm:right-auto`}
+      >
+        <Input
+          type="text"
+          placeholder="搜尋股票代碼或名稱"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setShowResults(true);
+          }}
+          className="w-64"
+        />
+        {showResults &&
+          (searchTerm.length > 1 || (stocks && stocks.length > 0)) && (
+            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
+              {loading && <p className="p-2">載入中...</p>}
+              {error && <p className="p-2">發生錯誤，請稍後再試</p>}
+              {!loading && stocks && stocks.length === 0 && (
+                <p className="p-2">沒有找到相關股票</p>
+              )}
+              {stocks &&
+                stocks.slice(0, 5).map((stock, index) => (
+                  <Link
+                    key={index}
+                    href={`/${stock.stockCode}/report`}
+                    onClick={() => {
+                      setShowResults(false);
+                      setIsSearchVisible(false);
+                    }}
+                  >
+                    <div className="p-2 hover:bg-gray-100">
+                      <p className="font-bold">
+                        {stock.stockCode} - {stock.stockName}
+                      </p>
+                      <p className="text-sm text-gray-600">{stock.industry}</p>
+                    </div>
+                  </Link>
+                ))}
+            </div>
           )}
-          {stocks.slice(0, 5).map((stock, index) => (
-            <Link
-              key={index}
-              href={`/stock/${stock.stockCode}/report`}
-              onClick={() => setShowResults(false)}
-            >
-              <div className="p-2 hover:bg-gray-100">
-                <p className="font-bold">
-                  {stock.stockCode} - {stock.stockName}
-                </p>
-                <p className="text-sm text-gray-600">{stock.industry}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 }
