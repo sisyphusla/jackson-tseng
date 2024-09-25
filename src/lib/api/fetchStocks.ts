@@ -25,8 +25,6 @@ export interface Stock {
 
 type RawStockRecord = Record<string, string>;
 
-const CACHE_EXPIRY = 30 * 60 * 1000; // 30分鐘
-
 export async function fetchStocks(): Promise<Stock[]> {
   try {
     const res = await fetch(url, {
