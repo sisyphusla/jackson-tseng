@@ -23,20 +23,34 @@ export interface Stock {
   lastUpdated?: number;
 }
 
-export async function fetchStocks(): Promise<Stock[]> {
-  try {
-    const dataPath = path.join(process.cwd(), 'src', 'data', 'stocksData.json');
-    const stocksData = await fs.readFile(dataPath, 'utf-8');
-    return JSON.parse(stocksData) as Stock[];
-  } catch (error) {
-    console.error('讀取股票數據時發生錯誤:', error);
-    return [];
-  }
-}
+let stocksCache: Stock[] | null = null;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 分鐘緩存
+let lastFetchTime = 0;
 
-export async function fetchStockReport(
-  stockCode: string
-): Promise<Stock | null> {
-  const stocks = await fetchStocks();
-  return stocks.find((s) => s.stockCode === stockCode) || null;
+export async function fetchStocks(
+  stockCode?: string
+): Promise<Stock[] | Stock | null> {
+  const now = Date.now();
+  if (!stocksCache || now - lastFetchTime > CACHE_DURATION) {
+    try {
+      const dataPath = path.join(
+        process.cwd(),
+        'src',
+        'data',
+        'stocksData.json'
+      );
+      const stocksData = await fs.readFile(dataPath, 'utf-8');
+      stocksCache = JSON.parse(stocksData) as Stock[];
+      lastFetchTime = now;
+    } catch (error) {
+      console.error('讀取股票數據時發生錯誤:', error);
+      return stockCode ? null : [];
+    }
+  }
+
+  if (stockCode) {
+    return stocksCache!.find((s) => s.stockCode === stockCode) || null;
+  }
+
+  return stocksCache!;
 }

@@ -6,7 +6,12 @@ export const revalidate = 3600 * 4; // 4 hours
 
 async function getStocks(): Promise<Stock[]> {
   const stocks = await fetchStocks();
-  return stocks;
+  if (Array.isArray(stocks)) {
+    return stocks;
+  } else {
+    console.error('Unexpected return type from fetchStocks');
+    return [];
+  }
 }
 
 export default async function Home() {
