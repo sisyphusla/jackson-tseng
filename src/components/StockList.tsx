@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { BaseStockData } from '@/types/stock';
 import { StockCard } from '@/components/StockCard';
 
