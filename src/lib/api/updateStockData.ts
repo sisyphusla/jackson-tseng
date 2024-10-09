@@ -71,7 +71,7 @@ export async function fetchAndSaveStocks(): Promise<StockData[]> {
       columns: true,
       skip_empty_lines: true,
       trim: true,
-    }) as any[];
+    }) as Record<string, string>[];
 
     const filteredRecords = records.filter(
       (record) =>

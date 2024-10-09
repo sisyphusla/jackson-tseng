@@ -25,7 +25,7 @@ const BATCH_SIZE = 50; // Number of stocks per batch
 async function updateRealTimePrice() {
   try {
     const dataPath = path.join(process.cwd(), 'src', 'data', 'stocksData.json');
-    let stocksData = JSON.parse(
+    const stocksData = JSON.parse(
       await fs.readFile(dataPath, 'utf-8')
     ) as StockData[];
 

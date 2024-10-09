@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const stocks = await fetchStocks();
     return NextResponse.json(stocks);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { message: '獲取股票數據時發生錯誤' },
       { status: 500 }
