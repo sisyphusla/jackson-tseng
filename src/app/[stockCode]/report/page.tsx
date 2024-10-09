@@ -54,6 +54,7 @@ export default async function StockReportPage({
 
     return '';
   };
+
   return (
     <div className="container mx-auto p-6 min-h-[calc(100vh-3.5rem)]">
       <Card className="w-full">
@@ -83,8 +84,8 @@ export default async function StockReportPage({
                 [
                   {
                     label: 'YTD：',
-                    value: stock.yearToDateReturn,
-                    colorClass: getColorClass(stock.yearToDateReturn),
+                    value: stock.YTD,
+                    colorClass: getColorClass(stock.YTD),
                   },
                   {
                     label: '潛在幅度：',
@@ -99,8 +100,8 @@ export default async function StockReportPage({
               icon={Info}
               items={[
                 [
-                  { label: '市值：', value: stock.marketValue },
-                  { label: '券商：', value: stock.analyst },
+                  { label: '市值：', value: stock.marketCap },
+                  { label: '券商：', value: stock.broker },
                 ],
                 [{ label: '產業：', value: stock.industry }],
               ]}
@@ -110,14 +111,14 @@ export default async function StockReportPage({
               icon={TrendingUp}
               items={[
                 [
-                  { label: '24EPS(F)：', value: stock.eps24F },
-                  { label: '25EPS(F)：', value: stock.eps25F },
+                  { label: '24EPS(F)：', value: stock.EPS24F },
+                  { label: '25EPS(F)：', value: stock.EPS25F },
                 ],
                 [
                   {
                     label: 'YoY：',
-                    value: stock.yearOverYearGrowth,
-                    colorClass: getColorClass(stock.yearOverYearGrowth, true),
+                    value: stock.YoY,
+                    colorClass: getColorClass(stock.YoY, true),
                   },
                 ],
               ]}
@@ -126,8 +127,8 @@ export default async function StockReportPage({
               title="P/E Ratio"
               icon={PieChart}
               items={[
-                [{ label: '24EPS(F)：', value: stock.pe24F }],
-                [{ label: '(T)PE：', value: stock.targetPE }],
+                [{ label: '24PE(F)：', value: stock.PE24F }],
+                [{ label: '(T)PE：', value: stock.TPE }],
               ]}
             />
           </div>
@@ -138,17 +139,19 @@ export default async function StockReportPage({
                 <CardTitle className="text-center">報告動能觀點</CardTitle>
               </CardHeader>
               <CardContent className="whitespace-pre-line leading-relaxed tracking-widest">
-                {stock.reportMomentum.map((paragraph, index) => (
-                  <React.Fragment key={index}>
-                    {'-'} {paragraph}
-                    {index < stock.reportMomentum.length - 1 && (
-                      <>
-                        <br />
-                        <br />
-                      </>
-                    )}
-                  </React.Fragment>
-                ))}
+                {stock.reportMomentumView
+                  .split('\n')
+                  .map((paragraph, index, array) => (
+                    <React.Fragment key={index}>
+                      {'-'} {paragraph}
+                      {index < array.length - 1 && (
+                        <>
+                          <br />
+                          <br />
+                        </>
+                      )}
+                    </React.Fragment>
+                  ))}
               </CardContent>
             </Card>
           </div>

@@ -2,34 +2,22 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Stock } from '@/lib/api/fetchStocks';
 
-export interface StockCardProps {
-  stockCode: string;
-  stockName: string;
-  industry: string;
-  currentPrice: string;
-  yearToDateReturn: string;
-  targetPrice: string;
-  reportDate: string;
-  analyst: string;
-  reportMomentum: string[];
-  eps24F: string;
-  pe24F: string;
-  potentialGrowth: string;
-}
-
-export function StockCard(props: StockCardProps) {
+export function StockCard(props: Stock) {
   const {
     stockCode,
     stockName,
     industry,
-    analyst,
+    broker,
     currentPrice,
-    eps24F,
-    pe24F,
+    EPS24F,
+    PE24F,
     reportDate,
     potentialGrowth,
+    YTD,
   } = props;
+
   const getColorClass = (value: string, isGrowth = false) => {
     const numValue = parseFloat(value.replace('%', ''));
     if (isNaN(numValue)) return '';
@@ -52,6 +40,7 @@ export function StockCard(props: StockCardProps) {
 
     return '';
   };
+
   return (
     <Card className="w-full m-2 shadow-md">
       <CardHeader className="flex flex-row items-center justify-between p-4 pb-2">
@@ -72,15 +61,18 @@ export function StockCard(props: StockCardProps) {
           <span className="text-sm w-1/2 text-left">產業: {industry}</span>
         </div>
         <div className="flex justify-between mb-3">
-          <span className="text-sm w-1/2 text-left">EPS24(F): {eps24F}</span>
-          <span className="text-sm w-1/2 text-left">24PE(F): {pe24F}</span>
+          <span className="text-sm w-1/2 text-left">EPS24(F): {EPS24F}</span>
+          <span className="text-sm w-1/2 text-left">24PE(F): {PE24F}</span>
         </div>
         <div className="flex justify-between mb-3">
-          <span className="text-xs text-gray-500 w-1/2 text-left">
-            報告日期: {reportDate}
+          <span className="text-sm w-1/2 text-left">
+            YTD: <span className={getColorClass(YTD, true)}>{YTD}</span>
           </span>
-          <span className="text-xs text-gray-500 w-1/2 text-left">
-            券商: {analyst}
+          <span className="text-sm w-1/2 text-left">券商: {broker}</span>
+        </div>
+        <div className="flex justify-between mb-3">
+          <span className="text-xs text-gray-500 w-full text-left">
+            報告日期: {reportDate}
           </span>
         </div>
         <div className="mt-4">

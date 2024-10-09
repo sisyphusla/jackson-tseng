@@ -1,9 +1,14 @@
-import { fetchStocks, Stock } from '@/lib/api/fetchStocks';
 import { NextResponse } from 'next/server';
+import { fetchStocks } from '@/lib/api/fetchStocks';
 
-export async function GET(): Promise<NextResponse<Stock[]>> {
-  const stocks = await fetchStocks();
-  return NextResponse.json(stocks);
+export async function GET() {
+  try {
+    const stocks = await fetchStocks();
+    return NextResponse.json(stocks);
+  } catch (error) {
+    return NextResponse.json(
+      { message: '獲取股票數據時發生錯誤' },
+      { status: 500 }
+    );
+  }
 }
-
-export const revalidate = 3600 * 4; // 4 hours
