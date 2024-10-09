@@ -9,7 +9,9 @@ const Footer = () => {
           className="flex items-center space-x-2"
           target="_blank"
         >
-          <span className="font-bold">聯絡我</span>
+          <span className="font-bold">
+            報價並非的即時報價，所提供資訊均僅供參考，不宜做為買賣依據之用。
+          </span>
         </Link>
       </div>
     </footer>
