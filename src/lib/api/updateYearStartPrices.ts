@@ -52,7 +52,7 @@ async function loadCache(): Promise<TradingDayCache> {
   try {
     const data = await fs.readFile(CACHE_FILE, 'utf-8');
     return JSON.parse(data);
-  } catch (error) {
+  } catch {
     return {};
   }
 }
