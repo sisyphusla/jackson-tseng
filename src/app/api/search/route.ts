@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { fetchStocks } from '@/lib/api/fetchStocks';
+import { BaseStockData, getStockWithDefaults } from '@/types/stock';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -11,11 +12,18 @@ export async function GET(request: Request) {
 
   try {
     const stocks = await fetchStocks();
-    const filteredStocks = stocks.filter(
-      (stock) =>
-        stock.stockCode.toLowerCase().includes(query.toLowerCase()) ||
-        stock.stockName.toLowerCase().includes(query.toLowerCase())
-    );
+
+    if (!stocks || !Array.isArray(stocks)) {
+      return NextResponse.json({ error: '無法獲取股票數據' }, { status: 500 });
+    }
+
+    const filteredStocks = stocks
+      .map((stock) => getStockWithDefaults(stock))
+      .filter(
+        (stock: BaseStockData) =>
+          stock.stockCode.toLowerCase().includes(query.toLowerCase()) ||
+          stock.stockName.toLowerCase().includes(query.toLowerCase())
+      );
 
     return NextResponse.json(filteredStocks);
   } catch (error) {
