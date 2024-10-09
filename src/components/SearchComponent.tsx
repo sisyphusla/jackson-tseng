@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
-import { Stock } from '@/lib/api/fetchStocks';
+import { BaseStockData } from '@/types/stock';
 import Link from 'next/link';
 import useSWR from 'swr';
 import { Search } from 'lucide-react';
@@ -13,7 +13,7 @@ export function SearchComponent() {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const { data: stocks, error } = useSWR<Stock[]>(
+  const { data: stocks, error } = useSWR<BaseStockData[]>(
     searchTerm.length > 1
       ? `/api/search?query=${encodeURIComponent(searchTerm)}`
       : null,

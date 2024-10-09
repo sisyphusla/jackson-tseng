@@ -1,10 +1,11 @@
 import { Suspense } from 'react';
-import { fetchStocks, Stock } from '@/lib/api/fetchStocks';
+import { fetchStocks } from '@/lib/api/fetchStocks';
+import { BaseStockData } from '@/types/stock';
 import StockList from '@/components/StockList';
 
 export const revalidate = 3600 * 4; // 4 hours
 
-async function getStocks(): Promise<Stock[]> {
+async function getStocks(): Promise<BaseStockData[]> {
   const stocks = await fetchStocks();
   if (Array.isArray(stocks)) {
     return stocks;

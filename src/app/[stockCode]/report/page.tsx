@@ -2,7 +2,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, Info, TrendingUp, PieChart } from 'lucide-react';
 import { InfoCard } from '@/components/InfoCard';
-import { fetchStocks, Stock } from '@/lib/api/fetchStocks';
+import { fetchStocks } from '@/lib/api/fetchStocks';
+import { BaseStockData } from '@/types/stock';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 3600 * 4; // 4 hours
@@ -19,7 +20,7 @@ export default async function StockReportPage({
 }: {
   params: { stockCode: string };
 }) {
-  const stock = (await fetchStocks(params.stockCode)) as Stock | null;
+  const stock = (await fetchStocks(params.stockCode)) as BaseStockData | null;
 
   if (!stock) {
     notFound();

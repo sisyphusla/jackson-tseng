@@ -2,9 +2,10 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Stock } from '@/lib/api/fetchStocks';
+import { BaseStockData, getStockWithDefaults } from '@/types/stock';
 
-export function StockCard(props: Stock) {
+export function StockCard(props: BaseStockData) {
+  const stock = getStockWithDefaults(props);
   const {
     stockCode,
     stockName,
@@ -16,7 +17,7 @@ export function StockCard(props: Stock) {
     reportDate,
     potentialGrowth,
     YTD,
-  } = props;
+  } = stock;
 
   const getColorClass = (value: string, isGrowth = false) => {
     const numValue = parseFloat(value.replace('%', ''));

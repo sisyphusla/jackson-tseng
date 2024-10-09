@@ -1,23 +1,7 @@
 import yahooFinance from 'yahoo-finance2';
 import fs from 'fs/promises';
 import path from 'path';
-
-interface StockData {
-  stockCode: string;
-  stockName: string;
-  YahooFinanceSymbol: string;
-  currentPrice?: string;
-  yearStartPrice?: string;
-  YTD?: string;
-  targetPrice?: string;
-  potentialGrowth?: string;
-  marketCap?: string;
-  EPS24F?: string;
-  PE24F?: string;
-  TPE?: string;
-  lastUpdated?: number;
-  [key: string]: string | number | undefined;
-}
+import { BaseStockData } from '@/types/stock';
 
 const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes cache duration
 const BATCH_SIZE = 50; // Number of stocks per batch
@@ -27,7 +11,7 @@ async function updateRealTimePrice() {
     const dataPath = path.join(process.cwd(), 'src', 'data', 'stocksData.json');
     const stocksData = JSON.parse(
       await fs.readFile(dataPath, 'utf-8')
-    ) as StockData[];
+    ) as BaseStockData[];
 
     const currentTime = Date.now();
     const stocksToUpdate = stocksData.filter(

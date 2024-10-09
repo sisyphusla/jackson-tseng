@@ -2,30 +2,9 @@ import fs from 'fs/promises';
 import path from 'path';
 import { parse } from 'csv-parse/sync';
 import yahooFinance from 'yahoo-finance2';
+import { BaseStockData, getStockWithDefaults } from '@/types/stock';
 
 yahooFinance.suppressNotices(['ripHistorical', 'yahooSurvey']);
-
-interface StockData {
-  stockCode: string;
-  stockName: string;
-  industry: string;
-  yearStartPrice: string;
-  currentPrice: string;
-  YTD: string;
-  targetPrice: string;
-  potentialGrowth: string;
-  EPS24F: string;
-  EPS25F: string;
-  YoY: string;
-  PE24F: string;
-  TPE: string;
-  marketCap: string;
-  reportDate: string;
-  broker: string;
-  reportMomentumView: string;
-  YahooFinanceSymbol?: string;
-  [key: string]: string | undefined;
-}
 
 interface TaiwanStock {
   StockName: string;
@@ -53,7 +32,7 @@ async function createStockLookup(): Promise<StockLookup> {
   }
 }
 
-export async function fetchAndSaveStocks(): Promise<StockData[]> {
+export async function fetchAndSaveStocks(): Promise<BaseStockData[]> {
   const SHEET_ID = '1JF1nsYrA-4b5qZgLL_QBs6w0skxRStNF1IiqN06FLnk';
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
 
@@ -83,9 +62,9 @@ export async function fetchAndSaveStocks(): Promise<StockData[]> {
 
     // 獲取 Yahoo Finance 符號和年初價
     const stockLookup = await createStockLookup();
-    const updatedRecords = filteredRecords.map((record): StockData => {
+    const updatedRecords = filteredRecords.map((record): BaseStockData => {
       const stockInfo = stockLookup[record['股票代號']];
-      return {
+      return getStockWithDefaults({
         stockCode: record['股票代號'],
         stockName: record['股票名稱'],
         industry: record['產業'],
@@ -104,7 +83,7 @@ export async function fetchAndSaveStocks(): Promise<StockData[]> {
         broker: record['券商'],
         reportMomentumView: record['報告動能觀點'],
         YahooFinanceSymbol: stockInfo?.YahooFinanceSymbol,
-      };
+      });
     });
 
     // 保存到 JSON 文件
