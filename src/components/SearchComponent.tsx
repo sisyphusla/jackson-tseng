@@ -52,6 +52,12 @@ export function SearchComponent() {
     }
   };
 
+  const clearSearch = () => {
+    setSearchTerm('');
+    setShowResults(false);
+    setIsSearchVisible(false);
+  };
+
   return (
     <div className="relative" ref={searchRef}>
       <div className="sm:hidden">
@@ -87,10 +93,7 @@ export function SearchComponent() {
                   <Link
                     key={index}
                     href={`/${stock.stockCode}/report`}
-                    onClick={() => {
-                      setShowResults(false);
-                      setIsSearchVisible(false);
-                    }}
+                    onClick={clearSearch}
                   >
                     <div className="p-2 hover:bg-gray-100">
                       <p className="font-bold">
