@@ -1,18 +1,18 @@
 import { Suspense } from 'react';
 import { fetchStocks } from '@/lib/api/fetchStocks';
 import { BaseStockData } from '@/types/stock';
-import StockList from '@/components/StockList';
+import dynamic from 'next/dynamic';
 
-export const revalidate = 3600 * 4; // 4 hours
+const StockList = dynamic(() => import('@/components/StockList'), {
+  ssr: true,
+  loading: () => <div>Loading...</div>,
+});
+
+export const revalidate = 14400; // 4 小時 (3600 * 4 秒)
 
 async function getStocks(): Promise<BaseStockData[]> {
   const stocks = await fetchStocks();
-  if (Array.isArray(stocks)) {
-    return stocks;
-  } else {
-    console.error('Unexpected return type from fetchStocks');
-    return [];
-  }
+  return Array.isArray(stocks) ? stocks : [];
 }
 
 export default async function Home() {

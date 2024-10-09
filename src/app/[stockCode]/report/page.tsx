@@ -6,54 +6,48 @@ import { fetchStocks } from '@/lib/api/fetchStocks';
 import { BaseStockData } from '@/types/stock';
 import { notFound } from 'next/navigation';
 
-export const revalidate = 3600 * 4; // 4 hours
+export const revalidate = 14400; // 4 小時 (3600 * 4 秒)
 
 export async function generateStaticParams() {
   const stocks = await fetchStocks();
-  return (Array.isArray(stocks) ? stocks : []).map((stock) => ({
+  return (Array.isArray(stocks) ? stocks : []).slice(0, 20).map((stock) => ({
     stockCode: stock.stockCode,
   }));
 }
 
-export default async function StockReportPage({
-  params,
-}: {
-  params: { stockCode: string };
-}) {
-  const stock = (await fetchStocks(params.stockCode)) as BaseStockData | null;
+const getColorClass = (value: string, isGrowth = false) => {
+  const numValue = parseFloat(value.replace('%', ''));
+  if (isNaN(numValue)) return '';
 
+  if (isGrowth) {
+    if (numValue > 0) {
+      if (numValue > 20) return 'text-pink-600 font-bold';
+      if (numValue > 15) return 'text-pink-500 font-bold';
+      if (numValue > 10) return 'text-pink-400 font-bold';
+      if (numValue > 5) return 'text-pink-300 font-bold';
+      return 'text-pink-200 font-bold';
+    } else if (numValue < 0) {
+      if (numValue < -20) return 'text-green-800';
+      if (numValue < -15) return 'text-green-700';
+      if (numValue < -10) return 'text-green-600';
+      if (numValue < -5) return 'text-green-500';
+      return 'text-green-400 font-bold';
+    }
+  } else {
+    return numValue > 0
+      ? 'text-red-500 font-bold'
+      : numValue < 0
+      ? 'text-green-500'
+      : '';
+  }
+
+  return '';
+};
+
+export default function StockReportPage({ stock }: { stock: BaseStockData }) {
   if (!stock) {
     notFound();
   }
-
-  const getColorClass = (value: string, isGrowth = false) => {
-    const numValue = parseFloat(value.replace('%', ''));
-    if (isNaN(numValue)) return '';
-
-    if (isGrowth) {
-      if (numValue > 0) {
-        if (numValue > 20) return 'text-pink-600 font-bold';
-        if (numValue > 15) return 'text-pink-500 font-bold';
-        if (numValue > 10) return 'text-pink-400 font-bold';
-        if (numValue > 5) return 'text-pink-300 font-bold';
-        return 'text-pink-200 font-bold';
-      } else if (numValue < 0) {
-        if (numValue < -20) return 'text-green-800';
-        if (numValue < -15) return 'text-green-700';
-        if (numValue < -10) return 'text-green-600';
-        if (numValue < -5) return 'text-green-500';
-        return 'text-green-400 font-bold';
-      }
-    } else {
-      return numValue > 0
-        ? 'text-red-500 font-bold'
-        : numValue < 0
-        ? 'text-green-500'
-        : '';
-    }
-
-    return '';
-  };
 
   return (
     <div className="container mx-auto p-6 min-h-[calc(100vh-3.5rem)]">
