@@ -1,6 +1,5 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-// import UpdateScheduler from '@/components/UpdateScheduler';
 import './globals.css';
 import type { Metadata } from 'next';
 
@@ -20,7 +19,6 @@ export default function RootLayout({
   return (
     <html lang="zh-Hant">
       <body>
-        {/* <UpdateScheduler /> */}
         <Header />
         {children}
         <Footer />
