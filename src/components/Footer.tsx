@@ -10,7 +10,7 @@ const Footer = () => {
           target="_blank"
         >
           <span className="font-bold text-sm">
-            報價並非的即時報價，所提供資訊均僅供參考，不宜做為買賣依據之用。
+            報價並非即時報價，所提供資訊均僅供參考，不宜做為買賣依據之用。
           </span>
         </Link>
       </div>

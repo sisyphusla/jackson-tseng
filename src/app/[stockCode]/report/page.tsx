@@ -5,15 +5,43 @@ import { InfoCard } from '@/components/InfoCard';
 import { fetchStocks } from '@/lib/api/fetchStocks';
 import { BaseStockData } from '@/types/stock';
 import { notFound } from 'next/navigation';
-import { getColorClass } from '@/lib/utils';
 
 export const revalidate = 3600 * 4; // 4 hours
 
 export async function generateStaticParams() {
   const stocks = await fetchStocks();
+
   return (Array.isArray(stocks) ? stocks : []).map((stock) => ({
     stockCode: stock.stockCode,
   }));
+}
+function getColorClass(value: string, isGrowth = false): string {
+  const numValue = parseFloat(value.replace('%', ''));
+  if (isNaN(numValue)) return '';
+
+  if (isGrowth) {
+    if (numValue > 0) {
+      if (numValue > 20) return 'text-pink-600 font-bold';
+      if (numValue > 15) return 'text-pink-500 font-bold';
+      if (numValue > 10) return 'text-pink-400 font-bold';
+      if (numValue > 5) return 'text-pink-300 font-bold';
+      return 'text-pink-200 font-bold';
+    } else if (numValue < 0) {
+      if (numValue < -20) return 'text-green-800';
+      if (numValue < -15) return 'text-green-700';
+      if (numValue < -10) return 'text-green-600';
+      if (numValue < -5) return 'text-green-500';
+      return 'text-green-400 font-bold';
+    }
+  } else {
+    return numValue > 0
+      ? 'text-red-500 font-bold'
+      : numValue < 0
+      ? 'text-green-500'
+      : '';
+  }
+
+  return '';
 }
 
 export default async function StockReportPage({
