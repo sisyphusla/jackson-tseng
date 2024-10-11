@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import { fetchAndSaveStocks } from '@/lib/api/updateStockData';
+export const maxDuration = 20;
 
 export async function POST(request: NextRequest) {
   // 獲取請求頭中的 x-api-key

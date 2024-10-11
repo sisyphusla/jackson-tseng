@@ -36,7 +36,7 @@ jobs:
                -H "x-api-key: $X_API_KEY" \
                -H "Content-Type: application/json" \
                -w "\n%{http_code}" \
-               --max-time 30 \
+               --max-time 20 \
                https://jackson-tseng.vercel.app/api/updateRealTimePrice)
           status_code=$(echo "$response" | tail -n1)
           body=$(echo "$response" | sed '$d')
