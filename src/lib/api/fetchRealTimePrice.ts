@@ -1,16 +1,34 @@
 import yahooFinance from 'yahoo-finance2';
-import fs from 'fs/promises';
-import path from 'path';
+import {
+  S3Client,
+  GetObjectCommand,
+  PutObjectCommand,
+} from '@aws-sdk/client-s3';
 import { BaseStockData } from '@/types/stock';
 
-const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes cache duration
-const BATCH_SIZE = 50; // Number of stocks per batch
+const CACHE_DURATION = 15 * 60 * 1000; // 15 分鐘緩存時間
+const BATCH_SIZE = 50; // 每批次處理的股票數量
+
+const s3Client = new S3Client({
+  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  region: 'auto',
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+});
 
 async function updateRealTimePrice() {
   try {
-    const dataPath = path.join(process.cwd(), 'src', 'data', 'stocksData.json');
+    // 從 R2 讀取股票數據
+    const getCommand = new GetObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: 'stocksData.json',
+    });
+
+    const response = await s3Client.send(getCommand);
     const stocksData = JSON.parse(
-      await fs.readFile(dataPath, 'utf-8')
+      await response.Body!.transformToString()
     ) as BaseStockData[];
 
     const currentTime = Date.now();
@@ -58,11 +76,8 @@ async function updateRealTimePrice() {
                 ? formatMarketCap(quote.marketCap)
                 : 'N/A';
 
-              // Calculate PE24F
               stock['PE24F'] =
                 eps24F > 0 ? (currentPrice / eps24F).toFixed(2) + 'x' : 'N/A';
-
-              // Calculate TPE
               stock['TPE'] =
                 targetPrice > 0 && eps24F > 0
                   ? (targetPrice / eps24F).toFixed(2) + 'x'
@@ -73,29 +88,37 @@ async function updateRealTimePrice() {
           }
         });
 
-        // Add delay after each batch
+        // 每批次處理後添加延遲
         await new Promise((resolve) => setTimeout(resolve, 1000));
       } catch (error) {
-        console.error(`Error updating batch (${i}-${i + BATCH_SIZE}):`, error);
+        console.error(`更新批次 (${i}-${i + BATCH_SIZE}) 時發生錯誤:`, error);
       }
     }
 
-    await fs.writeFile(dataPath, JSON.stringify(stocksData, null, 2));
+    // 將更新後的數據寫回 R2
+    const putCommand = new PutObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: 'stocksData.json',
+      Body: JSON.stringify(stocksData),
+      ContentType: 'application/json',
+    });
+    await s3Client.send(putCommand);
 
-    console.log('Stock data update completed');
-    console.log('First five updated records:');
+    console.log('股票數據更新完成');
+    console.log('前五筆更新後的記錄:');
     stocksData.slice(0, 5).forEach((stock, index) => {
       console.log(
-        `${index + 1}. ${stock.stockCode} - ${stock.stockName}: Current Price ${
+        `${index + 1}. ${stock.stockCode} - ${stock.stockName}: 現價 ${
           stock.currentPrice
-        }, YTD ${stock.YTD}, ` +
-          `Potential Growth ${stock.potentialGrowth}, Market Cap ${stock.marketCap}, PE24F ${stock['PE24F']}, TPE ${stock['TPE']}`
+        }, ` +
+          `年初至今 ${stock.YTD}, 潛在成長 ${stock.potentialGrowth}, 市值 ${stock.marketCap}, ` +
+          `本益比(預估) ${stock['PE24F']}, 目標本益比 ${stock['TPE']}`
       );
     });
 
     return stocksData;
   } catch (error) {
-    console.error('Error updating stock data:', error);
+    console.error('更新股票數據時發生錯誤:', error);
     throw error;
   }
 }

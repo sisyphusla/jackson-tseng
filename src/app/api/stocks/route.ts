@@ -10,9 +10,10 @@ export async function GET() {
       's-maxage=300, stale-while-revalidate'
     );
     return response;
-  } catch {
+  } catch (error) {
+    console.error('獲取股票數據時發生錯誤:', error);
     return NextResponse.json(
-      { message: '獲取股票數據時發生錯誤' },
+      { message: '獲取股票數據時發生錯誤，請檢查伺服器日誌以獲取更多信息' },
       { status: 500 }
     );
   }

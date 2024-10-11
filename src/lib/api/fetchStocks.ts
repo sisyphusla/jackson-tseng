@@ -1,5 +1,4 @@
-import fs from 'fs/promises';
-import path from 'path';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { BaseStockData, getStockWithDefaults } from '@/types/stock';
 
 let stocksCache: BaseStockData[] | null = null;
@@ -7,12 +6,21 @@ let lastFetchTime = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 分鐘緩存
 const STALE_DURATION = 30 * 1000; // 30 秒後視為過期
 
+const s3Client = new S3Client({
+  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  region: 'auto',
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+});
+
 export async function fetchStocks(
   stockCode?: string
 ): Promise<BaseStockData[] | BaseStockData | null> {
   const now = Date.now();
 
-  // 如果緩存不存在或已完全過期，從文件重新讀取
+  // 如果緩存不存在或已完全過期，從 R2 重新讀取
   if (!stocksCache || now - lastFetchTime > CACHE_DURATION) {
     await refreshCache();
   } else if (now - lastFetchTime > STALE_DURATION) {
@@ -29,8 +37,13 @@ export async function fetchStocks(
 
 async function refreshCache() {
   try {
-    const dataPath = path.join(process.cwd(), 'src', 'data', 'stocksData.json');
-    const stocksData = await fs.readFile(dataPath, 'utf-8');
+    const getCommand = new GetObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: 'stocksData.json',
+    });
+
+    const response = await s3Client.send(getCommand);
+    const stocksData = await response.Body!.transformToString();
     stocksCache = JSON.parse(stocksData).map((stock: Partial<BaseStockData>) =>
       getStockWithDefaults(stock)
     );

@@ -1,8 +1,8 @@
-import fs from 'fs/promises';
-import path from 'path';
 import { parse } from 'csv-parse/sync';
 import yahooFinance from 'yahoo-finance2';
 import { BaseStockData, getStockWithDefaults } from '@/types/stock';
+import { r2Client, R2_BUCKET_NAME } from '../r2Client';
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 
 yahooFinance.suppressNotices(['ripHistorical', 'yahooSurvey']);
 
@@ -17,17 +17,16 @@ interface StockLookup {
 }
 
 async function createStockLookup(): Promise<StockLookup> {
-  const taiwanStocksPath = path.join(
-    process.cwd(),
-    'src',
-    'data',
-    'taiwan_stocks.json'
-  );
   try {
-    const taiwanStocksData = await fs.readFile(taiwanStocksPath, 'utf-8');
-    return JSON.parse(taiwanStocksData) as StockLookup;
+    const command = new GetObjectCommand({
+      Bucket: R2_BUCKET_NAME,
+      Key: 'taiwan_stocks.json',
+    });
+    const response = await r2Client.send(command);
+    const taiwanStocksData = await response.Body?.transformToString();
+    return JSON.parse(taiwanStocksData || '{}') as StockLookup;
   } catch (error) {
-    console.error('讀取或解析 taiwan_stocks.json 時發生錯誤:', error);
+    console.error('讀取或解析 R2 中的 taiwan_stocks.json 時發生錯誤:', error);
     return {};
   }
 }
@@ -86,18 +85,20 @@ export async function fetchAndSaveStocks(): Promise<BaseStockData[]> {
       });
     });
 
-    // 保存到 JSON 文件
-    const dataDir = path.join(process.cwd(), 'src', 'data');
-    await fs.mkdir(dataDir, { recursive: true });
-    await fs.writeFile(
-      path.join(dataDir, 'stocksData.json'),
-      JSON.stringify(updatedRecords, null, 2)
-    );
+    // 保存到 R2
+    const command = new PutObjectCommand({
+      Bucket: R2_BUCKET_NAME,
+      Key: 'stocksData.json',
+      Body: JSON.stringify(updatedRecords, null, 2),
+      ContentType: 'application/json',
+    });
 
-    console.log(`成功保存 ${updatedRecords.length} 條股票數據`);
+    await r2Client.send(command);
+
+    console.log(`成功保存 ${updatedRecords.length} 條股票數據到 R2`);
     return updatedRecords;
   } catch (error) {
-    console.error('獲取或解析 CSV 數據時發生錯誤:', error);
+    console.error('獲取、解析 CSV 數據或保存到 R2 時發生錯誤:', error);
     throw error;
   }
 }
