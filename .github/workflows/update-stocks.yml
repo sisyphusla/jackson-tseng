@@ -1,0 +1,46 @@
+name: Update Stocks Data and Real-Time Prices
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-stocks-and-prices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Stocks Data
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+        run: |
+          response=$(curl -X POST \
+               -H "x-api-key: $X_API_KEY" \
+               -H "Content-Type: application/json" \
+               -w "\n%{http_code}" \
+               https://jackson-tseng.vercel.app/api/updateStocks)
+          status_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          echo "Status code: $status_code"
+          echo "Response body: $body"
+          if [ "$status_code" -ne 200 ]; then
+            echo "API call to update stocks failed"
+            exit 1
+          fi
+
+      - name: Update Real-Time Prices
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+        run: |
+          response=$(curl -X POST \
+               -H "x-api-key: $X_API_KEY" \
+               -H "Content-Type: application/json" \
+               -w "\n%{http_code}" \
+               https://jackson-tseng.vercel.app/api/updateRealTimePrice)
+          status_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          echo "Status code: $status_code"
+          echo "Response body: $body"
+          if [ "$status_code" -ne 200 ]; then
+            echo "API call to update real-time prices failed"
+            exit 1
+          fi
