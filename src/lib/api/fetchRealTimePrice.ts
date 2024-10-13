@@ -6,7 +6,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { BaseStockData } from '@/types/stock';
 
-const CACHE_DURATION = 15 * 60 * 1000; // 15 分鐘緩存時間
+const UPDATE_THRESHOLD = 20 * 60 * 1000; // 20 min
 const BATCH_SIZE = 50; // 每批次處理的股票數量
 
 const s3Client = new S3Client({
@@ -34,8 +34,13 @@ async function updateRealTimePrice() {
     const currentTime = Date.now();
     const stocksToUpdate = stocksData.filter(
       (stock) =>
-        !stock.lastUpdated || currentTime - stock.lastUpdated > CACHE_DURATION
+        !stock.lastUpdated || currentTime - stock.lastUpdated > UPDATE_THRESHOLD
     );
+
+    if (stocksToUpdate.length === 0) {
+      console.log('All stocks are up to date. No updates needed.');
+      return stocksData;
+    }
 
     for (let i = 0; i < stocksToUpdate.length; i += BATCH_SIZE) {
       const batch = stocksToUpdate.slice(i, i + BATCH_SIZE);
@@ -104,7 +109,7 @@ async function updateRealTimePrice() {
     });
     await s3Client.send(putCommand);
 
-    console.log('股票數據更新完成');
+    console.log(`股票數據更新完成，更新了 ${stocksToUpdate.length} 筆記錄`);
     console.log('前五筆更新後的記錄:');
     stocksData.slice(0, 5).forEach((stock, index) => {
       console.log(

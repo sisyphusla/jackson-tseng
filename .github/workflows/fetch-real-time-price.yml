@@ -1,15 +1,19 @@
-name: Update Stock Data
+name: Fetch Real-Time Price
 
 on:
   schedule:
-    - cron: '0 */2 * * *' # 每兩小時執行一次
+    - cron: '*/30 1-6 * * 1-5' # 週一到週五，UTC 1:00-6:00 (台灣時間 9:00-14:00) 每30分鐘
+    - cron: '0 0,7-23 * * 1-5' # 週一到週五，其他時間每小時
+    - cron: '0 * * * 0,6' # 週六和週日，每小時
+  repository_dispatch:
+    types: [trigger-fetch-real-time-price]
   workflow_dispatch: # 允許手動觸發
 
 jobs:
-  update-stock-data:
+  fetch-real-time-price:
     runs-on: ubuntu-latest
     steps:
-      - name: Update Stocks Data
+      - name: Fetch Real-Time Price
         env:
           X_API_KEY: ${{ secrets.X_API_KEY }}
         run: |
@@ -17,22 +21,13 @@ jobs:
                -H "x-api-key: $X_API_KEY" \
                -H "Content-Type: application/json" \
                -w "\n%{http_code}" \
-               --max-time 300 \
-               https://jackson-tseng.vercel.app/api/updateStocks)
+               --max-time 20 \
+               https://jackson-tseng.vercel.app/api/updateRealTimePrice)
           status_code=$(echo "$response" | tail -n1)
           body=$(echo "$response" | sed '$d')
           echo "Status code: $status_code"
           echo "Response body: $body"
           if [ "$status_code" -ne 200 ]; then
-            echo "API call to update stocks failed"
+            echo "API call to update real-time prices failed"
             exit 1
           fi
-
-      - name: Wait for 3 seconds
-        run: sleep 3
-
-      - name: Trigger fetchRealTimePrice workflow
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.X_API_KEY }}
-          event-type: trigger-fetch-real-time-price
