@@ -3,7 +3,7 @@ import { fetchStocks } from '@/lib/api/fetchStocks';
 import { BaseStockData } from '@/types/stock';
 import StockList from '@/components/StockList';
 
-export const revalidate = 3600 * 4; // 4 hours
+export const revalidate = 3600 * 1; // 1 hours
 
 async function getStocks(): Promise<BaseStockData[]> {
   const stocks = await fetchStocks();

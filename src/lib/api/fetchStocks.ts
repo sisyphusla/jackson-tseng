@@ -4,7 +4,7 @@ import { BaseStockData, getStockWithDefaults } from '@/types/stock';
 let stocksCache: BaseStockData[] | null = null;
 let lastFetchTime = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 分鐘緩存
-const STALE_DURATION = 30 * 1000; // 30 秒後視為過期
+const STALE_DURATION = 1 * 60 * 1000; // 1 分鐘後視為過期
 
 const s3Client = new S3Client({
   endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -48,6 +48,7 @@ async function refreshCache() {
       getStockWithDefaults(stock)
     );
     lastFetchTime = Date.now();
+    console.log(`Cache refreshed at ${new Date(lastFetchTime).toISOString()}`);
   } catch (error) {
     console.error('讀取股票數據時發生錯誤:', error);
     if (!stocksCache) stocksCache = [];
