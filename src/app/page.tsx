@@ -1,15 +1,7 @@
-// src/app/page.tsx
-
 import { Suspense } from 'react';
 import { fetchStocks } from '@/lib/api/fetchStocks';
-import {
-  BaseStockData,
-  SortState,
-  SortOption,
-  SortDirection,
-} from '@/types/stock';
+import { BaseStockData, SortState, SortOption } from '@/types/stock';
 import SortableStockList from '@/components/SortableStockList';
-import { cookies } from 'next/headers';
 
 export const revalidate = 3600 * 1; // 1 hour
 
@@ -26,17 +18,9 @@ async function getStocks(): Promise<BaseStockData[]> {
 }
 
 export default async function Home() {
-  const cookieStore = cookies();
-  const sortPreference = cookieStore.get('stockSortPreference')
-    ?.value as SortOption;
-  const directionPreference = cookieStore.get('stockSortDirection')
-    ?.value as SortDirection;
-
   const initialSortState: SortState = {
-    sortBy: validSortOptions.includes(sortPreference)
-      ? sortPreference
-      : 'reportDate',
-    direction: directionPreference === 'desc' ? 'desc' : 'asc',
+    sortBy: 'reportDate',
+    direction: 'asc',
   };
 
   const initialStocks = await getStocks();

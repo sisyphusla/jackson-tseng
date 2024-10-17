@@ -1,5 +1,3 @@
-// src/components/SortableStockList.tsx
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -66,8 +64,6 @@ export default function SortableStockList({
           ? 'desc'
           : 'asc',
     }));
-    document.cookie = `stockSortPreference=${newSortBy}; path=/; max-age=3600`;
-    document.cookie = `stockSortDirection=${sortState.direction}; path=/; max-age=3600`;
   };
 
   const toggleSortDirection = () => {
@@ -75,9 +71,6 @@ export default function SortableStockList({
       ...prev,
       direction: prev.direction === 'asc' ? 'desc' : 'asc',
     }));
-    document.cookie = `stockSortDirection=${
-      sortState.direction === 'asc' ? 'desc' : 'asc'
-    }; path=/; max-age=3600`;
   };
 
   return (
