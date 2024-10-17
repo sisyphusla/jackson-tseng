@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { fetchStocks } from '@/lib/api/fetchStocks';
-import { BaseStockData, SortState, SortOption } from '@/types/stock';
+import { BaseStockData, SortState } from '@/types/stock';
 import SortableStockList from '@/components/SortableStockList';
 
 export const revalidate = 3600 * 1; // 1 hour
