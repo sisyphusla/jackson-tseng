@@ -5,8 +5,6 @@ import SortableStockList from '@/components/SortableStockList';
 
 export const revalidate = 3600 * 1; // 1 hour
 
-const validSortOptions: SortOption[] = ['reportDate', 'potentialGrowth', 'YTD'];
-
 async function getStocks(): Promise<BaseStockData[]> {
   const stocks = await fetchStocks();
   if (Array.isArray(stocks)) {
