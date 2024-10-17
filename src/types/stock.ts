@@ -27,21 +27,28 @@ export function getStockWithDefaults(
     stockCode: stock.stockCode || '',
     stockName: stock.stockName || '',
     industry: stock.industry || '',
-    yearStartPrice: stock.yearStartPrice || 'N/A',
-    currentPrice: stock.currentPrice || 'N/A',
-    YTD: stock.YTD || 'N/A',
-    targetPrice: stock.targetPrice || 'N/A',
-    potentialGrowth: stock.potentialGrowth || 'N/A',
-    EPS24F: stock.EPS24F || 'N/A',
-    EPS25F: stock.EPS25F || 'N/A',
-    YoY: stock.YoY || 'N/A',
-    PE24F: stock.PE24F || 'N/A',
-    TPE: stock.TPE || 'N/A',
-    marketCap: stock.marketCap || 'N/A',
+    yearStartPrice: stock.yearStartPrice || '',
+    currentPrice: stock.currentPrice || '',
+    YTD: stock.YTD || '',
+    targetPrice: stock.targetPrice || '',
+    potentialGrowth: stock.potentialGrowth || '',
+    EPS24F: stock.EPS24F || '',
+    EPS25F: stock.EPS25F || '',
+    YoY: stock.YoY || '',
+    PE24F: stock.PE24F || '',
+    TPE: stock.TPE || '',
+    marketCap: stock.marketCap || '',
     reportDate: stock.reportDate || '',
     broker: stock.broker || '',
     reportMomentumView: stock.reportMomentumView || '',
     YahooFinanceSymbol: stock.YahooFinanceSymbol || '',
     lastUpdated: stock.lastUpdated,
   };
+}
+export type SortDirection = 'asc' | 'desc';
+export type SortOption = 'reportDate' | 'potentialGrowth' | 'YTD';
+
+export interface SortState {
+  sortBy: SortOption;
+  direction: SortDirection;
 }

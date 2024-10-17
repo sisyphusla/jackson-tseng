@@ -69,24 +69,24 @@ async function updateRealTimePrice() {
                       ((currentPrice - yearStartPrice) / yearStartPrice) *
                       100
                     ).toFixed(2) + '%'
-                  : 'N/A';
+                  : '';
               stock.potentialGrowth =
                 currentPrice > 0
                   ? (
                       ((targetPrice - currentPrice) / currentPrice) *
                       100
                     ).toFixed(2) + '%'
-                  : 'N/A';
+                  : '';
               stock.marketCap = quote.marketCap
                 ? formatMarketCap(quote.marketCap)
-                : 'N/A';
+                : '';
 
               stock['PE24F'] =
-                eps24F > 0 ? (currentPrice / eps24F).toFixed(2) + 'x' : 'N/A';
+                eps24F > 0 ? (currentPrice / eps24F).toFixed(2) + 'x' : '';
               stock['TPE'] =
                 targetPrice > 0 && eps24F > 0
                   ? (targetPrice / eps24F).toFixed(2) + 'x'
-                  : 'N/A';
+                  : '';
 
               stock.lastUpdated = currentTime;
             }
