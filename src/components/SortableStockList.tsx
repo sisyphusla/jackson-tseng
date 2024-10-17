@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import StockList from '@/components/StockList';
 import { BaseStockData, SortState, SortOption } from '@/types/stock';
-import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { ArrowUp, ArrowDown } from 'lucide-react';
 
 const sortOptions = [
   { value: 'reportDate', label: '報告日期' },
