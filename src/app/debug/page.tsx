@@ -1,13 +1,13 @@
 'use client';
-import { useState } from 'react';
+// import { useState } from 'react';
 
 export default function DebugPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<any>(null);
-  const [error, setError] = useState<string>('');
-  const [logs, setLogs] = useState<string[]>([]);
-  const [rawData, setRawData] = useState<any>(null);
-  const [processedData, setProcessedData] = useState<any>(null);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [data, setData] = useState<any>(null);
+  // const [error, setError] = useState<string>('');
+  // const [logs, setLogs] = useState<string[]>([]);
+  // const [rawData, setRawData] = useState<any>(null);
+  // const [processedData, setProcessedData] = useState<any>(null);
 
   const handleTest = async () => {
     // setIsLoading(true);
@@ -48,13 +48,14 @@ export default function DebugPage() {
 
       <button
         onClick={handleTest}
-        disabled={isLoading}
+        // disabled={isLoading}
         className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
       >
-        {isLoading ? '資料處理中...' : '開始測試'}
+        {/* {isLoading ? '資料處理中...' : '開始測試'} */}
+        開始測試
       </button>
 
-      {error && (
+      {/* {error && (
         <div className="mt-4 p-4 bg-red-100 text-red-700 rounded">{error}</div>
       )}
 
@@ -83,7 +84,7 @@ export default function DebugPage() {
             {JSON.stringify(processedData, null, 2)}
           </pre>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

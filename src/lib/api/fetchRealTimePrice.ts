@@ -50,7 +50,6 @@ async function updateRealTimePrice() {
 
       try {
         const quotes = await yahooFinance.quote(symbols);
-        const currentYear = new Date().getFullYear().toString().slice(-2);
 
         batch.forEach((stock) => {
           if (stock.YahooFinanceSymbol) {
