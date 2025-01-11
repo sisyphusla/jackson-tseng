@@ -187,7 +187,7 @@ async function getYearStartPrices(
       const price = await getStockPrice(symbol, startDate, endDate, isNAStock);
       priceMap.set(symbol, price);
       console.log(`股票 ${symbol} 的價格: ${price}`);
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 增加延遲到1秒
+      await new Promise((resolve) => setTimeout(resolve, 100)); // 增加延遲到1秒
     } catch (error) {
       handleError(error, `獲取股票 ${symbol} 的價格`);
       priceMap.set(symbol, '#N/A');

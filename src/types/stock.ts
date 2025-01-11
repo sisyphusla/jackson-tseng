@@ -7,10 +7,10 @@ export interface BaseStockData {
   YTD: string;
   targetPrice: string;
   potentialGrowth: string;
-  EPS24F: string;
-  EPS25F: string;
+  currentYearEPS: string;
+  nextYearEPS: string;
   YoY: string;
-  PE24F: string;
+  currentYearPE: string;
   TPE: string;
   marketCap: string;
   reportDate: string;
@@ -32,10 +32,10 @@ export function getStockWithDefaults(
     YTD: stock.YTD || '',
     targetPrice: stock.targetPrice || '',
     potentialGrowth: stock.potentialGrowth || '',
-    EPS24F: stock.EPS24F || '',
-    EPS25F: stock.EPS25F || '',
+    currentYearEPS: stock.currentYearEPS || '',
+    nextYearEPS: stock.nextYearEPS || '',
     YoY: stock.YoY || '',
-    PE24F: stock.PE24F || '',
+    currentYearPE: stock.currentYearPE || '',
     TPE: stock.TPE || '',
     marketCap: stock.marketCap || '',
     reportDate: stock.reportDate || '',

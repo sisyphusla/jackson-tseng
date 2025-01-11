@@ -50,6 +50,7 @@ async function updateRealTimePrice() {
 
       try {
         const quotes = await yahooFinance.quote(symbols);
+        const currentYear = new Date().getFullYear().toString().slice(-2);
 
         batch.forEach((stock) => {
           if (stock.YahooFinanceSymbol) {
@@ -60,7 +61,7 @@ async function updateRealTimePrice() {
               const currentPrice = quote.regularMarketPrice || 0;
               const yearStartPrice = parseFloat(stock.yearStartPrice || '0');
               const targetPrice = parseFloat(stock.targetPrice || '0');
-              const eps24F = parseFloat(stock['EPS24F'] || '0');
+              const currentYearEPS = parseFloat(stock.currentYearEPS || '0');
 
               stock.currentPrice = currentPrice.toFixed(2);
               stock.YTD =
@@ -81,11 +82,13 @@ async function updateRealTimePrice() {
                 ? formatMarketCap(quote.marketCap)
                 : '';
 
-              stock['PE24F'] =
-                eps24F > 0 ? (currentPrice / eps24F).toFixed(2) + 'x' : '';
-              stock['TPE'] =
-                targetPrice > 0 && eps24F > 0
-                  ? (targetPrice / eps24F).toFixed(2) + 'x'
+              stock.currentYearPE =
+                currentYearEPS > 0
+                  ? (currentPrice / currentYearEPS).toFixed(2) + 'x'
+                  : '';
+              stock.TPE =
+                targetPrice > 0 && currentYearEPS > 0
+                  ? (targetPrice / currentYearEPS).toFixed(2) + 'x'
                   : '';
 
               stock.lastUpdated = currentTime;
@@ -117,7 +120,7 @@ async function updateRealTimePrice() {
           stock.currentPrice
         }, ` +
           `年初至今 ${stock.YTD}, 潛在成長 ${stock.potentialGrowth}, 市值 ${stock.marketCap}, ` +
-          `本益比(預估) ${stock['PE24F']}, 目標本益比 ${stock['TPE']}`
+          `本益比(預估) ${stock.currentYearPE}, 目標本益比 ${stock.TPE}`
       );
     });
 

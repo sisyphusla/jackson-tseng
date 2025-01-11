@@ -6,14 +6,16 @@ import { BaseStockData, getStockWithDefaults } from '@/types/stock';
 
 export function StockCard(props: BaseStockData) {
   const stock = getStockWithDefaults(props);
+  const currentYear = new Date().getFullYear().toString().slice(-2);
+
   const {
     stockCode,
     stockName,
     industry,
     broker,
     currentPrice,
-    EPS24F,
-    PE24F,
+    currentYearEPS,
+    currentYearPE,
     reportDate,
     potentialGrowth,
     YTD,
@@ -76,8 +78,12 @@ export function StockCard(props: BaseStockData) {
           <span className="text-sm w-1/2 text-left">產業: {industry}</span>
         </div>
         <div className="flex justify-between mb-3">
-          <span className="text-sm w-1/2 text-left">EPS24(F): {EPS24F}</span>
-          <span className="text-sm w-1/2 text-left">24PE(F): {PE24F}</span>
+          <span className="text-sm w-1/2 text-left">
+            {currentYear}EPS(F): {currentYearEPS}
+          </span>
+          <span className="text-sm w-1/2 text-left">
+            {currentYear}PE(F): {currentYearPE}
+          </span>
         </div>
         <div className="flex justify-between mb-3">
           <span className="text-sm w-1/2 text-left">

@@ -54,6 +54,8 @@ export default async function StockReportPage({
   if (!stock) {
     notFound();
   }
+  const currentYear = new Date().getFullYear().toString().slice(-2);
+  const nextYear = (new Date().getFullYear() + 1).toString().slice(-2);
 
   return (
     <div className="container mx-auto p-6 min-h-[calc(100vh-3.5rem)]">
@@ -62,12 +64,12 @@ export default async function StockReportPage({
           <CardTitle className="text-2xl font-bold w-full">
             <div className="flex justify-evenly items-center flex-wrap gap-2">
               <span>
-                {stock.stockCode}
+                {stock?.stockCode}
                 {'   '}
-                {stock.stockName}
+                {stock?.stockName}
               </span>
-              <span>現價：{stock.currentPrice}</span>
-              <span>{stock.reportDate}</span>
+              <span>現價：{stock?.currentPrice}</span>
+              <span>{stock?.reportDate}</span>
             </div>
           </CardTitle>
         </CardHeader>
@@ -78,19 +80,22 @@ export default async function StockReportPage({
               icon={DollarSign}
               items={[
                 [
-                  { label: '年初價格：', value: stock.yearStartPrice },
-                  { label: '目標價：', value: stock.targetPrice },
+                  { label: '年初價格：', value: stock?.yearStartPrice ?? '-' },
+                  { label: '目標價：', value: stock?.targetPrice ?? '-' },
                 ],
                 [
                   {
                     label: 'YTD：',
-                    value: stock.YTD,
-                    colorClass: getColorClass(stock.YTD),
+                    value: stock?.YTD ?? '-',
+                    colorClass: getColorClass(stock?.YTD ?? '-'),
                   },
                   {
                     label: '潛在幅度：',
-                    value: stock.potentialGrowth,
-                    colorClass: getColorClass(stock.potentialGrowth, true),
+                    value: stock?.potentialGrowth ?? '-',
+                    colorClass: getColorClass(
+                      stock?.potentialGrowth ?? '-',
+                      true
+                    ),
                   },
                 ],
               ]}
@@ -100,10 +105,10 @@ export default async function StockReportPage({
               icon={Info}
               items={[
                 [
-                  { label: '市值：', value: stock.marketCap },
-                  { label: '券商：', value: stock.broker },
+                  { label: '市值：', value: stock?.marketCap ?? '-' },
+                  { label: '券商：', value: stock?.broker ?? '-' },
                 ],
-                [{ label: '產業：', value: stock.industry }],
+                [{ label: '產業：', value: stock?.industry ?? '-' }],
               ]}
             />
             <InfoCard
@@ -111,14 +116,20 @@ export default async function StockReportPage({
               icon={TrendingUp}
               items={[
                 [
-                  { label: '24EPS(F)：', value: stock.EPS24F },
-                  { label: '25EPS(F)：', value: stock.EPS25F },
+                  {
+                    label: `${currentYear}EPS(F)：`,
+                    value: stock?.currentYearEPS ?? '-',
+                  },
+                  {
+                    label: `${nextYear}EPS(F)：`,
+                    value: stock?.nextYearEPS ?? '-',
+                  },
                 ],
                 [
                   {
                     label: 'YoY：',
-                    value: stock.YoY,
-                    colorClass: getColorClass(stock.YoY, true),
+                    value: stock?.YoY ?? '-',
+                    colorClass: getColorClass(stock?.YoY ?? '-', true),
                   },
                 ],
               ]}
@@ -127,8 +138,18 @@ export default async function StockReportPage({
               title="P/E Ratio"
               icon={PieChart}
               items={[
-                [{ label: '24PE(F)：', value: stock.PE24F }],
-                [{ label: '(T)PE：', value: stock.TPE }],
+                [
+                  {
+                    label: `${currentYear}PE(F)：`,
+                    value: stock?.currentYearPE ?? '-',
+                  },
+                ],
+                [
+                  {
+                    label: '(T)PE：',
+                    value: stock?.TPE ?? '-',
+                  },
+                ],
               ]}
             />
           </div>
