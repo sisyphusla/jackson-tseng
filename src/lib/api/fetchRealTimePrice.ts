@@ -41,6 +41,12 @@ async function updateRealTimePrice() {
       console.log('All stocks are up to date. No updates needed.');
       return stocksData;
     }
+    const cleanNumber = (value: string | undefined): number => {
+      if (!value) return 0;
+      // 只保留數字和小數點，其他字符都移除
+      const cleanedValue = value.replace(/[^0-9.]/g, '');
+      return parseFloat(cleanedValue) || 0;
+    };
 
     for (let i = 0; i < stocksToUpdate.length; i += BATCH_SIZE) {
       const batch = stocksToUpdate.slice(i, i + BATCH_SIZE);
@@ -58,9 +64,9 @@ async function updateRealTimePrice() {
             );
             if (quote) {
               const currentPrice = quote.regularMarketPrice || 0;
-              const yearStartPrice = parseFloat(stock.yearStartPrice || '0');
-              const targetPrice = parseFloat(stock.targetPrice || '0');
-              const currentYearEPS = parseFloat(stock.currentYearEPS || '0');
+              const yearStartPrice = cleanNumber(stock.yearStartPrice);
+              const targetPrice = cleanNumber(stock.targetPrice);
+              const currentYearEPS = cleanNumber(stock.currentYearEPS);
 
               stock.currentPrice = currentPrice.toFixed(2);
               stock.YTD =
@@ -83,11 +89,11 @@ async function updateRealTimePrice() {
 
               stock.currentYearPE =
                 currentYearEPS > 0
-                  ? (currentPrice / currentYearEPS).toFixed(2) + 'x'
+                  ? (currentPrice / currentYearEPS).toFixed(2)
                   : '';
               stock.TPE =
                 targetPrice > 0 && currentYearEPS > 0
-                  ? (targetPrice / currentYearEPS).toFixed(2) + 'x'
+                  ? (targetPrice / currentYearEPS).toFixed(2)
                   : '';
 
               stock.lastUpdated = currentTime;
